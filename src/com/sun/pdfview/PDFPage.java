@@ -32,6 +32,7 @@ import java.util.Map;
 import net.sf.andpdf.utils.Utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -203,7 +204,7 @@ public class PDFPage {
         // see if we already have this image
         Bitmap image = null;
         PDFRenderer renderer = null;
-        ImageInfo info = new ImageInfo(width*3, height*3, clip, Color.WHITE);
+        ImageInfo info = new ImageInfo(width, height, clip, Color.WHITE);
 
 //        if (cache != null) {
 //            image = cache.getImage(this, info);
@@ -215,8 +216,10 @@ public class PDFPage {
             if (drawbg) {
                 info.bgColor = Color.WHITE;
             }
+            
+            
 
-            image = Bitmap.createBitmap(width*3, height*3, Config.ARGB_8888);
+            image = Bitmap.createBitmap(width, height, Config.ARGB_8888);
             renderer = new PDFRenderer(this, info, image);
 
 //            if (cache != null) {

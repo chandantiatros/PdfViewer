@@ -253,7 +253,7 @@ public class PDFImage {
     }
 
 	private Bitmap parseData(byte[] imgBytes) {
-		Bitmap bi;
+		Bitmap bi = null;
 		long startTime = System.currentTimeMillis();
 		// parse the stream data into an actual image
 		Log.i(TAG, "Creating Image width="+getWidth() + ", Height="+getHeight()+", bpc="+getBitsPerComponent()+",cs="+colorSpace);
@@ -264,19 +264,19 @@ public class PDFImage {
 			int maxW = getWidth();
 			if (imgBytes.length > 700000 ) {
 				// decoded JPEG as RGB565
-				Log.i(TAG, "if img length = "+imgBytes.length);
+				Log.i(TAG, "if RGB > 700000 img length = "+imgBytes.length);
 				bi = Bitmap.createBitmap(maxW, maxH, Config.ARGB_8888);
 				bi.copyPixelsFromBuffer(ByteBuffer.wrap(imgBytes));
 			}
-			else if (imgBytes.length > 100000 && imgBytes.length < 500000) {
+			else if (imgBytes.length > 70000 && imgBytes.length < 350000) {
 				// decoded JPEG as RGB565
-				Log.i(TAG, "if img length = "+imgBytes.length);
+				Log.i(TAG, "if img RGB > 10000 < 350000 length = "+imgBytes.length);
 				bi = Bitmap.createBitmap(maxW, maxH, Config.ARGB_8888);
 				bi.copyPixelsFromBuffer(ByteBuffer.wrap(imgBytes));
 			}
 			else {
 				// create RGB image
-				Log.i(TAG, "else img length = "+imgBytes.length);
+				Log.i(TAG, "else img RGB < 100000 length = "+imgBytes.length);
 				bi = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
 				int[] line = new int[maxW]; 
 				int n=0;
@@ -294,26 +294,33 @@ public class PDFImage {
 		else if (colorSpace.getType() == PDFColorSpace.COLORSPACE_GRAY) {
 			// create gray image
 			Log.i(TAG, " else if gray image img length = "+imgBytes.length);
-			Log.i(TAG, "if img length = "+imgBytes.length);
+			
 			int maxH = getHeight();
 			int maxW = getWidth();
 			bi = Bitmap.createBitmap(maxW, maxH, Config.ARGB_8888);
 			bi.copyPixelsFromBuffer(ByteBuffer.wrap(imgBytes));
+			long stopTime = System.currentTimeMillis();
+			Log.i(TAG, "millis for converting image="+(stopTime-startTime));
+			return bi;
 		}
 		else if (colorSpace.getType() == PDFColorSpace.COLORSPACE_INDEXED) {
 			// create indexed image
 			Log.i(TAG, " else if indexed image img length = "+imgBytes.length);
-			bi = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+//			bi = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
 			int maxH = getHeight();
 			int maxW = getWidth();
+			bi = Bitmap.createBitmap(maxW, maxH, Config.ARGB_4444);
+			//bi.copyPixelsFromBuffer(ByteBuffer.wrap(imgBytes));
 			int[] line = new int[maxW];
 			int[] comps = new int[1];
 			int n=0;
 			for (int h = 0; h<maxH; h++) {
 				for (int w = 0; w<getWidth(); w++) {
-					comps[0] = imgBytes[n]&0xff;
-					line[w] = colorSpace.toColor(comps);
-					n+=1;
+					//comps[0] = imgBytes[n]&0xff;
+					//line[w] = colorSpace.toColor(comps);
+					//n+=1;
+					line[w] = Color.rgb(0xff&(int)imgBytes[n], 0xff&(int)imgBytes[n+1],0xff&(int)imgBytes[n+2]);
+					n+=3;
 				}
 				bi.setPixels(line, 0, maxW, 0, h, maxW, 1);
 			}

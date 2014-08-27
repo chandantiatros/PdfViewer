@@ -1558,8 +1558,8 @@ public class PDFFile {
         PDFObject pageObj = null;
         boolean needread = false;
 
-        PDFPage page = cache.getPage(key);
-        PDFParser parser = cache.getPageParser(key);
+        PDFPage page = null;// = cache.getPage(key);
+        PDFParser parser = null;// = cache.getPageParser(key);
         if (page == null) {
             try {
                 // hunt down the page!
@@ -1577,7 +1577,7 @@ public class PDFFile {
                 byte[] stream = getContents(pageObj);
                 parser = new PDFParser(page, stream, resources);
 
-                cache.addPage(key, page, parser);
+              //  cache.addPage(key, page, parser);
             } catch (IOException ioe) {
                 System.out.println("GetPage inner loop:");
                 ioe.printStackTrace();
